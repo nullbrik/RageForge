@@ -1,0 +1,119 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:RageForge.Gui.ViewModels"
+        xmlns:shaders="using:RageForge.Core.Shaders"
+        xmlns:c="using:RageForge.Gui.Controls"
+        x:Class="RageForge.Gui.Views.ViewerWindow"
+        x:DataType="vm:PreviewViewModel"
+        Icon="/Assets/rageforge.ico"
+        Width="1000" Height="720" MinWidth="480" MinHeight="320"
+        WindowStartupLocation="CenterOwner"
+        Title="{Binding Title, StringFormat='{}{0} - RageForge'}">
+
+    <DockPanel>
+
+        <Border DockPanel.Dock="Top" Background="{DynamicResource RfChrome}"
+                BorderBrush="{DynamicResource RfBorder}" BorderThickness="0,0,0,1" Padding="4,3">
+            <DockPanel>
+                <StackPanel Orientation="Horizontal" Spacing="2">
+                    <Button Classes="tool" IsVisible="{Binding IsModel}" Name="ResetViewButton" ToolTip.Tip="Reset view (double-click)">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Classes="icon" Text="&#xE8B3;" />
+                            <TextBlock Text="Reset view" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button Classes="tool" IsVisible="{Binding IsAudio}" Command="{Binding PlayAudioCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Classes="icon" Text="&#xE768;" />
+                            <TextBlock Text="Play" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="tool" IsVisible="{Binding IsAudio}" Command="{Binding StopAudioCommand}" IsEnabled="{Binding IsPlaying}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Classes="icon" Text="&#xE71A;" />
+                            <TextBlock Text="Stop" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <CheckBox IsVisible="{Binding IsShader}" IsChecked="{Binding ShowHlsl}" Content="Pseudo-HLSL" Margin="6,0" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Border DockPanel.Dock="Bottom" Background="{DynamicResource RfChrome}"
+                BorderBrush="{DynamicResource RfBorder}" BorderThickness="0,1,0,0" Padding="8,3">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Text="{Binding Info}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="{Binding Status}" Foreground="{DynamicResource RfSubtle}"
+                           VerticalAlignment="Center" Margin="12,0,0,0" />
+            </Grid>
+        </Border>
+
+        <Panel>
+            <ProgressBar IsVisible="{Binding IsLoading}" IsIndeterminate="True" Width="200" Height="4" MinHeight="4"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+            <Panel IsVisible="{Binding IsModel}" Background="{DynamicResource RfViewport}">
+                <c:ModelViewport Name="Gpu" Meshes="{Binding Meshes}" Scene="{Binding Scene}" IsVisible="{Binding !UseSoftware}" />
+                <Border Name="Viewport" IsVisible="{Binding UseSoftware}" Background="Transparent" ClipToBounds="True">
+                    <Image Source="{Binding Image}" Stretch="Uniform" IsHitTestVisible="False" />
+                </Border>
+                <TextBlock Text="Left drag: rotate · Right drag: pan · Wheel: zoom · Double-click: reset" Foreground="#80FFFFFF"
+                           FontSize="11" Margin="10,8" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                           IsHitTestVisible="False" />
+            </Panel>
+
+            <Grid IsVisible="{Binding IsImage}" ColumnDefinitions="Auto,Auto,*">
+                <ListBox Grid.Column="0" Width="320" IsVisible="{Binding HasDictionary}" ItemsSource="{Binding DictTextures}"
+                         SelectedItem="{Binding SelectedDictTexture}" Background="{DynamicResource RfSurface}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:DictTexture">
+                            <TextBlock Text="{Binding Display}" FontFamily="{StaticResource RfMono}" FontSize="11" Margin="2,1" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <GridSplitter Grid.Column="1" Width="1" IsVisible="{Binding HasDictionary}" Background="{DynamicResource RfBorder}" ResizeDirection="Columns" />
+                <ScrollViewer Grid.Column="2" HorizontalScrollBarVisibility="Auto" Background="{DynamicResource RfViewport}">
+                    <Image Source="{Binding Image}" Stretch="Uniform" StretchDirection="DownOnly" Margin="12" />
+                </ScrollViewer>
+            </Grid>
+
+            <ListBox IsVisible="{Binding IsAudio}" ItemsSource="{Binding Tracks}" SelectedItem="{Binding SelectedTrack}"
+                     Name="TrackList" Background="{DynamicResource RfSurface}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:AudioTrack">
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="4,2">
+                            <TextBlock Classes="icon" Text="&#xE8D6;" Foreground="{DynamicResource RfFileGlyph}" />
+                            <TextBlock Text="{Binding Display}" FontFamily="{StaticResource RfMono}" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <TextBox IsVisible="{Binding IsVideo}" Text="{Binding Text}" IsReadOnly="True" AcceptsReturn="True"
+                     FontFamily="{StaticResource RfMono}" BorderThickness="0" Padding="16,12" />
+
+            <TextBox IsVisible="{Binding IsText}" Text="{Binding Text}" IsReadOnly="True" AcceptsReturn="True"
+                     FontFamily="{StaticResource RfMono}" BorderThickness="0" Padding="10,8" TextWrapping="NoWrap"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto" />
+
+            <Grid IsVisible="{Binding IsShader}" ColumnDefinitions="300,Auto,*">
+                <DockPanel>
+                    <TextBox DockPanel.Dock="Top" Text="{Binding ShaderFilter}" PlaceholderText="Filter: PS, CS, NGG, RT, hash" Margin="4" />
+                    <ListBox ItemsSource="{Binding Shaders}" SelectedItem="{Binding SelectedShader}" Background="{DynamicResource RfSurface}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="shaders:ShaderEntry">
+                                <TextBlock Text="{Binding Display}" FontFamily="{StaticResource RfMono}" FontSize="11" Margin="2,1" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+                <GridSplitter Grid.Column="1" Width="1" Background="{DynamicResource RfBorder}" ResizeDirection="Columns" />
+                <TextBox Grid.Column="2" Text="{Binding ShaderText}" IsReadOnly="True" AcceptsReturn="True"
+                         FontFamily="{StaticResource RfMono}" BorderThickness="0" Padding="10,8" TextWrapping="NoWrap"
+                         ScrollViewer.HorizontalScrollBarVisibility="Auto" />
+            </Grid>
+        </Panel>
+    </DockPanel>
+</Window>

@@ -1,0 +1,87 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="RageForge.Gui.App"
+             xmlns:local="using:RageForge.Gui"
+             RequestedThemeVariant="Light">
+    <Application.DataTemplates>
+        <local:ViewLocator />
+    </Application.DataTemplates>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="RfChrome" Color="#F3F3F3" />
+                    <SolidColorBrush x:Key="RfSurface" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="RfBorder" Color="#D9D9D9" />
+                    <SolidColorBrush x:Key="RfSubtle" Color="#6B6B6B" />
+                    <SolidColorBrush x:Key="RfGlyph" Color="#C08A1E" />
+                    <SolidColorBrush x:Key="RfFileGlyph" Color="#4A6FA5" />
+                    <SolidColorBrush x:Key="RfViewport" Color="#1E1E22" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="RfChrome" Color="#202020" />
+                    <SolidColorBrush x:Key="RfSurface" Color="#191919" />
+                    <SolidColorBrush x:Key="RfBorder" Color="#333333" />
+                    <SolidColorBrush x:Key="RfSubtle" Color="#9A9A9A" />
+                    <SolidColorBrush x:Key="RfGlyph" Color="#E0B050" />
+                    <SolidColorBrush x:Key="RfFileGlyph" Color="#7FA7DC" />
+                    <SolidColorBrush x:Key="RfViewport" Color="#141416" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+            <FontFamily x:Key="RfIcons">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+            <FontFamily x:Key="RfMono">Cascadia Mono, Consolas, monospace</FontFamily>
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme DensityStyle="Compact" />
+
+        <Style Selector="Window">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Background" Value="{DynamicResource RfSurface}" />
+        </Style>
+
+        <Style Selector="TextBlock.icon">
+            <Setter Property="FontFamily" Value="{StaticResource RfIcons}" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="Button.tool">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="7,4" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="CornerRadius" Value="3" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="ToggleButton.mode">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="10,4" />
+            <Setter Property="CornerRadius" Value="4" />
+        </Style>
+
+        <Style Selector="Button.header">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0,0,1,0" />
+            <Setter Property="BorderBrush" Value="{DynamicResource RfBorder}" />
+            <Setter Property="CornerRadius" Value="0" />
+            <Setter Property="Padding" Value="6,3" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+
+        <Style Selector="ListBox.details ListBoxItem">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="MinHeight" Value="22" />
+        </Style>
+
+        <Style Selector="TreeViewItem">
+            <Setter Property="MinHeight" Value="22" />
+        </Style>
+    </Application.Styles>
+</Application>

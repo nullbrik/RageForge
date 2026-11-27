@@ -1,0 +1,296 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:RageForge.Gui.ViewModels"
+        xmlns:m="using:RageForge.Gui.Models"
+        xmlns:c="using:RageForge.Gui.Controls"
+        x:Class="RageForge.Gui.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Icon="/Assets/rageforge.ico"
+        Width="1280" Height="800" MinWidth="820" MinHeight="480"
+        Title="RageForge">
+
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Alt+Left" Command="{Binding BackCommand}" />
+        <KeyBinding Gesture="Alt+Right" Command="{Binding ForwardCommand}" />
+        <KeyBinding Gesture="Alt+Up" Command="{Binding UpCommand}" />
+        <KeyBinding Gesture="F5" Command="{Binding RefreshCommand}" />
+    </Window.KeyBindings>
+
+    <DockPanel>
+
+        <Menu DockPanel.Dock="Top" Background="{DynamicResource RfChrome}" Padding="2,0">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open game folder..." Name="MenuOpenFolder" InputGesture="Ctrl+O" HotKey="Ctrl+O" />
+                <Separator />
+                <MenuItem Header="E_xit" Name="MenuExit" />
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="_Open" Name="MenuOpen" InputGesture="Enter" />
+                <Separator />
+                <MenuItem Header="Copy _name" Name="MenuCopyName" />
+                <MenuItem Header="Copy _path" Name="MenuCopyPath" />
+                <Separator />
+                <MenuItem Header="P_roperties" Name="MenuProperties" />
+            </MenuItem>
+            <MenuItem Header="_View">
+                <MenuItem Header="_Dark theme" ToggleType="CheckBox" IsChecked="{Binding IsDark}" />
+                <Separator />
+                <MenuItem Header="_Time of day">
+                    <MenuItem Header="_Dawn" ToggleType="Radio" GroupName="TimeOfDay" IsChecked="{Binding World.IsDawn, Mode=OneWay}"
+                              Command="{Binding World.SetTimeCommand}" CommandParameter="dawn" />
+                    <MenuItem Header="D_ay" ToggleType="Radio" GroupName="TimeOfDay" IsChecked="{Binding World.IsDay, Mode=OneWay}"
+                              Command="{Binding World.SetTimeCommand}" CommandParameter="day" />
+                    <MenuItem Header="_Sunset" ToggleType="Radio" GroupName="TimeOfDay" IsChecked="{Binding World.IsSunset, Mode=OneWay}"
+                              Command="{Binding World.SetTimeCommand}" CommandParameter="sunset" />
+                    <MenuItem Header="_Night" ToggleType="Radio" GroupName="TimeOfDay" IsChecked="{Binding World.IsNight, Mode=OneWay}"
+                              Command="{Binding World.SetTimeCommand}" CommandParameter="night" />
+                </MenuItem>
+                <MenuItem Header="Show _water" ToggleType="CheckBox" IsChecked="{Binding World.ShowWater, Mode=OneWay}"
+                          Command="{Binding World.ToggleWaterCommand}" />
+                <Separator />
+                <MenuItem Header="_Refresh" Command="{Binding RefreshCommand}" InputGesture="F5" />
+            </MenuItem>
+            <MenuItem Header="_Index">
+                <MenuItem Header="_Load index" Command="{Binding LoadIndexCommand}" />
+                <MenuItem Header="_Build / update index" Command="{Binding BuildIndexCommand}" />
+                <MenuItem Header="_Cancel indexing" Command="{Binding CancelIndexCommand}" />
+            </MenuItem>
+        </Menu>
+
+        <Border DockPanel.Dock="Top" Background="{DynamicResource RfChrome}"
+                BorderBrush="{DynamicResource RfBorder}" BorderThickness="0,0,0,1" Padding="4,3">
+            <DockPanel>
+            <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="2" Margin="0,0,10,0">
+                <ToggleButton Classes="mode" IsChecked="{Binding IsExplorerMode}" ToolTip.Tip="Browse files (Ctrl+1)">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Classes="icon" Text="&#xE8B7;" />
+                        <TextBlock Text="Explorer" VerticalAlignment="Center" />
+                    </StackPanel>
+                </ToggleButton>
+                <ToggleButton Classes="mode" IsChecked="{Binding IsWorldMode}" ToolTip.Tip="Walk the map and interiors in 3D (Ctrl+2)">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Classes="icon" Text="&#xE909;" />
+                        <TextBlock Text="World" VerticalAlignment="Center" />
+                    </StackPanel>
+                </ToggleButton>
+                <ToggleButton Classes="mode" IsChecked="{Binding IsPedsMode}" ToolTip.Tip="Characters and animals assembled in 3D (Ctrl+3)">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Classes="icon" Text="&#xE77B;" />
+                        <TextBlock Text="Peds" VerticalAlignment="Center" />
+                    </StackPanel>
+                </ToggleButton>
+            </StackPanel>
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" IsVisible="{Binding !IsExplorerMode}">
+                <Button Classes="tool" Command="{Binding ToggleThemeCommand}" ToolTip.Tip="{Binding ThemeTip}">
+                    <TextBlock Classes="icon" Text="{Binding ThemeGlyph}" />
+                </Button>
+            </StackPanel>
+            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*,Auto,260,Auto,Auto,Auto" IsVisible="{Binding IsExplorerMode}">
+                <Button Grid.Column="0" Classes="tool" Command="{Binding BackCommand}" ToolTip.Tip="Back (Alt+Left)">
+                    <TextBlock Classes="icon" Text="&#xE72B;" />
+                </Button>
+                <Button Grid.Column="1" Classes="tool" Command="{Binding ForwardCommand}" ToolTip.Tip="Forward (Alt+Right)">
+                    <TextBlock Classes="icon" Text="&#xE72A;" />
+                </Button>
+                <Button Grid.Column="2" Classes="tool" Command="{Binding UpCommand}" ToolTip.Tip="Up (Alt+Up)">
+                    <TextBlock Classes="icon" Text="&#xE74A;" />
+                </Button>
+                <Button Grid.Column="3" Classes="tool" Command="{Binding RefreshCommand}" ToolTip.Tip="Refresh (F5)">
+                    <TextBlock Classes="icon" Text="&#xE72C;" />
+                </Button>
+                <TextBox Grid.Column="4" Margin="6,0" Text="{Binding LocationText, Mode=OneWay}" IsReadOnly="True"
+                         VerticalContentAlignment="Center" />
+                <TextBlock Grid.Column="5" Classes="icon" Text="&#xE721;" Margin="4,0" Foreground="{DynamicResource RfSubtle}" />
+                <TextBox Grid.Column="6" Name="SearchBox" Text="{Binding SearchText}"
+                         PlaceholderText="Filter folder, Enter = search all" VerticalContentAlignment="Center">
+                    <TextBox.KeyBindings>
+                        <KeyBinding Gesture="Enter" Command="{Binding GlobalSearchCommand}" />
+                    </TextBox.KeyBindings>
+                </TextBox>
+                <Button Grid.Column="7" Classes="tool" Margin="4,0,0,0" Command="{Binding GlobalSearchCommand}"
+                        Content="Search all" ToolTip.Tip="Search every indexed file by name" />
+                <Button Grid.Column="8" Classes="tool" Margin="6,0,0,0" Command="{Binding OpenUpdatePageCommand}"
+                        IsVisible="{Binding HasUpdate}" ToolTip.Tip="{Binding UpdateTip}">
+                    <TextBlock Classes="icon" Text="&#xE896;" Foreground="#2EA043" FontWeight="Bold" />
+                </Button>
+                <Button Grid.Column="9" Classes="tool" Margin="2,0,0,0" Command="{Binding ToggleThemeCommand}"
+                        ToolTip.Tip="{Binding ThemeTip}">
+                    <TextBlock Classes="icon" Text="{Binding ThemeGlyph}" />
+                </Button>
+            </Grid>
+            </DockPanel>
+        </Border>
+
+        <Border DockPanel.Dock="Bottom" Background="{DynamicResource RfChrome}"
+                BorderBrush="{DynamicResource RfBorder}" BorderThickness="0,1,0,0" Padding="8,3">
+            <Grid ColumnDefinitions="*,Auto,Auto">
+                <TextBlock Text="{Binding Status}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                <ProgressBar Grid.Column="1" IsIndeterminate="True" IsVisible="{Binding IsBusy}"
+                             Width="120" Height="4" MinHeight="4" Margin="12,0" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="2" Text="{Binding ItemsText}" Foreground="{DynamicResource RfSubtle}" VerticalAlignment="Center" />
+            </Grid>
+        </Border>
+
+        <Panel>
+        <Panel IsVisible="{Binding IsWorldMode}">
+        <Grid ColumnDefinitions="300,Auto,*" DataContext="{Binding World}" x:DataType="vm:WorldViewModel">
+            <DockPanel Grid.Column="0" Background="{DynamicResource RfSurface}">
+                <StackPanel DockPanel.Dock="Top" Spacing="6" Margin="8">
+                    <Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Classes="accent"
+                            Command="{Binding LoadWorldCommand}" Content="Load world" ToolTip.Tip="Fly over the whole map; detail loads as you get closer" />
+                    <TextBox Text="{Binding Search}" PlaceholderText="Search places (house, gas, tw2_20...)" />
+                    <Grid ColumnDefinitions="*,6,*">
+                        <ComboBox Grid.Column="0" HorizontalAlignment="Stretch" ItemsSource="{Binding Filters}" SelectedItem="{Binding Filter}"
+                                  ToolTip.Tip="Show interiors, map blocks or both" />
+                        <ComboBox Grid.Column="2" HorizontalAlignment="Stretch" ItemsSource="{Binding Radii}" SelectedItem="{Binding Radius}"
+                                  ToolTip.Tip="Map: view distance in metres (game LOD models beyond 300 m)" />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,6,Auto">
+                        <Button Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                Command="{Binding LoadSelectedCommand}" Content="Load selected" />
+                        <Button Grid.Column="2" Command="{Binding CancelLoadCommand}" Content="Cancel" IsEnabled="{Binding IsLoading}" />
+                    </Grid>
+                </StackPanel>
+                <TextBlock DockPanel.Dock="Bottom" Text="{Binding ListInfo}" Foreground="{DynamicResource RfSubtle}" Margin="8,4" />
+                <ListBox Name="PlaceList" ItemsSource="{Binding Places}" SelectedItem="{Binding SelectedPlace}" Classes="details"
+                         Background="{DynamicResource RfSurface}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:PlaceItem">
+                            <Grid ColumnDefinitions="Auto,*,Auto" Margin="8,2" Background="Transparent">
+                                <TextBlock Classes="icon" Text="{Binding Glyph}" Foreground="{DynamicResource RfGlyph}" Margin="0,0,8,0" />
+                                <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Grid.Column="2" Text="{Binding Kind}" Foreground="{DynamicResource RfSubtle}" VerticalAlignment="Center" Margin="8,0,0,0" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+            <GridSplitter Grid.Column="1" Width="1" Background="{DynamicResource RfBorder}" ResizeDirection="Columns" />
+            <Panel Grid.Column="2" Background="{DynamicResource RfViewport}">
+                <c:ModelViewport Name="WorldViewport" Scene="{Binding Scene}" SceneFocus="{Binding Focus}"
+                                 TimeOfDay="{Binding TimeOfDay}" ShowWater="{Binding ShowWater}" />
+                <Border VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8" Padding="8,3" CornerRadius="3"
+                        Background="#80000000" IsHitTestVisible="False">
+                    <TextBlock Name="WorldStats" Foreground="#E0FFFFFF" FontFamily="{StaticResource RfMono}" FontSize="11" />
+                </Border>
+                <ProgressBar IsVisible="{Binding IsLoading}" IsIndeterminate="True" Width="220" Height="4" MinHeight="4"
+                             VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,12,0,0" />
+                <Border VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Background="#99000000" Padding="10,5" IsHitTestVisible="False">
+                    <StackPanel>
+                        <TextBlock Text="{Binding SceneInfo}" Foreground="White" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="Left drag: look · Right drag: pan · Wheel: zoom · WASD/ZQSD: move · E/Space: up · C: down · Shift: faster · Ctrl: slower"
+                                   Foreground="#B0FFFFFF" FontSize="11" />
+                    </StackPanel>
+                </Border>
+            </Panel>
+        </Grid>
+        </Panel>
+
+        <Panel IsVisible="{Binding IsPedsMode}">
+        <Grid ColumnDefinitions="300,Auto,*" DataContext="{Binding Peds}" x:DataType="vm:PedsViewModel">
+            <DockPanel Grid.Column="0" Background="{DynamicResource RfSurface}">
+                <StackPanel DockPanel.Dock="Top" Spacing="6" Margin="8">
+                    <TextBox Text="{Binding Search}" PlaceholderText="Search characters (cs_danny, legacy, armadillo...)" />
+                    <ComboBox HorizontalAlignment="Stretch" ItemsSource="{Binding Filters}" SelectedItem="{Binding Filter}"
+                              ToolTip.Tip="Show people, animals or both" />
+                </StackPanel>
+                <TextBlock DockPanel.Dock="Bottom" Text="{Binding ListInfo}" Foreground="{DynamicResource RfSubtle}" Margin="8,4" />
+                <ListBox Name="PedList" ItemsSource="{Binding Peds}" SelectedItem="{Binding SelectedPed}" Classes="details"
+                         Background="{DynamicResource RfSurface}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:PedItem">
+                            <Grid ColumnDefinitions="Auto,*,Auto" Margin="8,2" Background="Transparent">
+                                <TextBlock Classes="icon" Text="{Binding Glyph}" Foreground="{DynamicResource RfGlyph}" Margin="0,0,8,0" />
+                                <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Grid.Column="2" Text="{Binding Kind}" Foreground="{DynamicResource RfSubtle}" VerticalAlignment="Center" Margin="8,0,0,0" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+            <GridSplitter Grid.Column="1" Width="1" Background="{DynamicResource RfBorder}" ResizeDirection="Columns" />
+            <Panel Grid.Column="2" Background="{DynamicResource RfViewport}">
+                <c:ModelViewport Name="PedViewport" Meshes="{Binding Meshes}" />
+                <ProgressBar IsVisible="{Binding IsLoading}" IsIndeterminate="True" Width="220" Height="4" MinHeight="4"
+                             VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,12,0,0" />
+                <Border VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Background="#99000000" Padding="10,5" IsHitTestVisible="False">
+                    <StackPanel>
+                        <TextBlock Text="{Binding Info}" Foreground="White" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="Left drag: rotate · Right drag: pan · Wheel: zoom · Double-click: reset"
+                                   Foreground="#B0FFFFFF" FontSize="11" />
+                    </StackPanel>
+                </Border>
+            </Panel>
+        </Grid>
+        </Panel>
+
+        <Grid ColumnDefinitions="290,Auto,*" IsVisible="{Binding IsExplorerMode}">
+
+            <TreeView Grid.Column="0" Name="Tree" ItemsSource="{Binding Roots}" SelectedItem="{Binding SelectedTreeNode}"
+                      Background="{DynamicResource RfSurface}" Padding="2,4">
+                <TreeView.Styles>
+                    <Style Selector="TreeViewItem" x:DataType="m:TreeNode">
+                        <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
+                    </Style>
+                </TreeView.Styles>
+                <TreeView.ItemTemplate>
+                    <TreeDataTemplate DataType="m:TreeNode" ItemsSource="{Binding Children}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Classes="icon" Text="{Binding Glyph}" Foreground="{DynamicResource RfGlyph}" />
+                            <TextBlock Text="{Binding Label}" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </TreeDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+
+            <GridSplitter Grid.Column="1" Width="1" Background="{DynamicResource RfBorder}" ResizeDirection="Columns" />
+
+            <DockPanel Grid.Column="2">
+                <Border DockPanel.Dock="Top" BorderBrush="{DynamicResource RfBorder}" BorderThickness="0,0,0,1"
+                        Background="{DynamicResource RfSurface}">
+                    <Grid ColumnDefinitions="*,220,110,200" Margin="0,0,14,0">
+                        <Button Grid.Column="0" Classes="header" Content="{Binding NameHeader}" Command="{Binding SortByCommand}" CommandParameter="Name" />
+                        <Button Grid.Column="1" Classes="header" Content="{Binding TypeHeader}" Command="{Binding SortByCommand}" CommandParameter="Type" />
+                        <Button Grid.Column="2" Classes="header" Content="{Binding SizeHeader}" Command="{Binding SortByCommand}" CommandParameter="Size"
+                                HorizontalContentAlignment="Right" />
+                        <Button Grid.Column="3" Classes="header" Content="{Binding LocationHeader}" Command="{Binding SortByCommand}" CommandParameter="Location" />
+                    </Grid>
+                </Border>
+
+                <ListBox Name="List" Classes="details" ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}"
+                         SelectionMode="Multiple" Background="{DynamicResource RfSurface}">
+                    <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Open" Name="CtxOpen" FontWeight="SemiBold" />
+                            <Separator />
+                            <MenuItem Header="Copy name" Name="CtxCopyName" />
+                            <MenuItem Header="Copy path" Name="CtxCopyPath" />
+                            <Separator />
+                            <MenuItem Header="Properties" Name="CtxProperties" />
+                            <Separator />
+                            <MenuItem Header="Open in World" Name="CtxOpenWorld" />
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="m:RowItem">
+                            <Grid ColumnDefinitions="*,220,110,200" Background="Transparent">
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="7" Margin="6,0">
+                                    <TextBlock Classes="icon" Text="{Binding Glyph}" FontSize="13"
+                                               Foreground="{DynamicResource RfFileGlyph}" />
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                                <TextBlock Grid.Column="1" Text="{Binding Type}" Margin="6,0" VerticalAlignment="Center"
+                                           Foreground="{DynamicResource RfSubtle}" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Grid.Column="2" Text="{Binding SizeText}" Margin="6,0" VerticalAlignment="Center"
+                                           HorizontalAlignment="Right" Foreground="{DynamicResource RfSubtle}" />
+                                <TextBlock Grid.Column="3" Text="{Binding Location}" Margin="6,0" VerticalAlignment="Center"
+                                           Foreground="{DynamicResource RfSubtle}" TextTrimming="CharacterEllipsis" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Grid>
+        </Panel>
+    </DockPanel>
+</Window>

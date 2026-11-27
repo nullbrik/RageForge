@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="BCnEncoder.Net" />
+    <PackageReference Include="SharpZipLib" />
+    <PackageReference Include="Concentus" />
+  </ItemGroup>
+
+</Project>

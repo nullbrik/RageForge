@@ -1,0 +1,46 @@
+# Reference clones (not part of this repo)
+reference/
+
+# Build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Test / coverage
+TestResults/
+*.coverage
+coverage/
+
+# NuGet
+*.nupkg
+*.snupkg
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Local experiments / exported assets (never commit game assets)
+samples/
+textures/
+export/
+*.toc
+*.rpf
+*.ttpf
+*.awc
+*.bk2
+*.ydr
+*.ytd
+
+# Kept local only
+CLAUDE.md
+tests/
+tools/
